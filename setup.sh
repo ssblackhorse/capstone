@@ -54,6 +54,11 @@ echo "Cloning CTFd repository to the ctfd volume..."
 git clone https://github.com/CTFd/CTFd.git /var/lib/docker/volumes/ctfd/
 echo "CTFd repository cloned successfully."
 
+# Make other scripts executable
+echo "Making the other scripts executable..."
+chmod +x create_courses.sh
+chmod +x user_info.sh
+chmod +x $PWD/troubleshooting/waiting_for_db_error.sh
 
 # Add dockeruser and grant sudo privileges
 echo "Creating the docker user and updating it's permissions..."
@@ -70,3 +75,5 @@ newgrp docker
 echo "New user details:"
 echo "Username: dockeruser"
 echo "Password: $(sudo cat /etc/shadow | grep dockeruser | awk -F':' '{print $2}')"
+
+echo "Change to this new user if you haven't already by 'su dockeruser'"

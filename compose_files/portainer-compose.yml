@@ -1,0 +1,27 @@
+version: "3"
+services:
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    ports:
+      - 9443:9443
+    volumes:
+      - portainer_data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ctfd:/ctfd
+      - classes:/classes
+    restart: unless-stopped
+    networks:
+      - swag_default
+
+volumes:
+  portainer_data:
+    external: true
+  ctfd:
+    external: true
+  classes:
+    external: true
+
+networks:
+  swag_default:
+    external: true

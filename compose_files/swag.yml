@@ -14,6 +14,7 @@ services:
       - VALIDATION=dns
       - DNSPLUGIN=cloudflare
       - EMAIL=${EMAIL}
+      - DOCKER_MODS=linuxserver/mods:universal-docker|linuxserver/mods:swag-auto-proxy|linuxserver/mods:swag-auto-reload
     volumes:
       - ${DOCKERDIR}/swag/config:/config
     ports:

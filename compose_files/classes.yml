@@ -3,6 +3,7 @@ version: '2'
 services:
   ctfd:
     image: ctfd:latest
+    container_name: ${COURSE}
     user: root
     restart: always
     ports:

@@ -5,11 +5,12 @@ Set up the environment necessary to host the BlackHorse OSINT/PAI course capston
 ## Deployment
 ### Clone this repository
 Clone this repository:
-```bash
+```
 git clone https://github.com/ssblackhorse/capstone 
 ```
 
-### Docker
+---
+# Docker
 This needs Docker and Docker Compose installed. 
 These can be installed by running [install_docker.sh](/setup/install_docker.sh) or by following the instructions here:
 
@@ -17,14 +18,14 @@ These can be installed by running [install_docker.sh](/setup/install_docker.sh) 
 
 [Docker Compose](https://docs.docker.com/compose/install/linux/#install-using-the-repository)
 
-Make sure to run the Docker post-installation steps as well. 
 [Post Install Instructions](https://docs.docker.com/engine/install/linux-postinstall/ )
 
-### Add a docker user
+---
+## Add a docker user
 Add a non-root user for this server. The user is going to be named 'dockeruser'.
 
 Add the user:
-```bash
+```
 adduser dockeruser
 ```
 
@@ -44,18 +45,29 @@ newgrp docker
 ```
 
 Change to the new user:
-```bash
+```
 su dockeruser
 ```
+--- 
+## Setup the necessary folders and networks
+We're going to front load some of the volumes and networks that need created. To do this easily, just run [create_environment.sh](/setup/create_environment.sh) or run these commands:
 
-### Install Portainer
+```
+docker volume create swag
+docker volume create classes
+docker volume create ctfd
+docker volume create portainer_data
+docker network create swag_default
+```
+---
+## Install Portainer
 Change the directory to compose_files
-```bash
+```
 cd compose_files
 ```
 
 Run portainer-compose.yml
-```bash
+```
 docker compose -f portainer-compose.yml
 ```
 
@@ -63,13 +75,14 @@ Portainer can now be accessed at https://{IP-ADDRESS}:9443.
 
 If you do not know the IP address for the server, try:
 
-```bash
+```
 curl -s ifconfig.me
 ```
 
 Open the Portainer web interface and you'll be asked to provide a password for the admin user. 
 
-### Setting up SWAG
+--- 
+## Setting up SWAG
 SWAG is the reverse proxy for this server. 
 
 In Portainer, navigate to 'Stacks' and create a new stack called 'swag'.
@@ -81,7 +94,7 @@ Below that box, add [example.env](/config_files/example.env) as Environmental Va
 Add the values to 'PUID', 'PGID', 'DOMAIN', and 'EMAIL'.
 
 Make sure you are 'dockeruser' and to find the PUID and PGID, type:
-```bash
+```
 id $USER
 ```
 
@@ -91,7 +104,16 @@ After a few minutes, test that it's working by going to your domain.
 
 In the swag directory (/var/lib/docker/volumes/swag/config/dns-conf) modify the appropriate .ini file for the dns provider. 
 
-### Building the CTFd Image
+---
+## Clone the CTFd repo
+We also need to clone the CTFd repo to the appropriate location. 
+
+```
+sudo git clone https://github.com/CTFd/CTFd /var/lib/docker/volumes/ctfd/CTFd
+```
+
+---
+## Building the CTFd Image
 In order for this configuration to work, we need to build our own CTFd image. 
 
 In Portainer, navigate to Images and select 'Build a new image'. 
@@ -102,16 +124,29 @@ Below the web editor, upload [requirements.txt](/config_files/requirements.txt) 
 
 Select 'Build the image' and wait. This takes a few minutes. 
 
-### Creating Capstones
+---
+
+# Creating Capstones
 For any capstones that will be made, the following needs to be done:
 
-#### Prep the folders and confs
-To set up courses, run [create_courses.sh](/setup/create_courses.sh). This will ask for a course name (ie, caso) and build the necessary folder structures. It will also generate the subdomain.conf files necessary for SWAG. 
+## Prep the folders and confs
+To set up courses, run [create_courses.sh](/setup/create_courses.sh). This will ask for a course name (ie, caso) and build the necessary folder structures. It will also generate the subfolder.conf files necessary for SWAG. 
 
-### Creating the stack
+```
+courses
+  └─$coursename
+    ├─ uploads
+    ├─ logs
+    ├─ redis
+    │  └─ data
+    └─ db
+       └─ mysql
+```
+
+## Creating the stack
 Just like with swag, we need to add the capstone stacks in Portainer. 
 
-Create a new stack and give it the name of the course. Copy the contents of [classes.yml](/config_files/classes.yml) into the editor. 
+Create a new stack and give it the name of the course. Copy the contents of [classes.yml](/compose_files/classes.yml) into the editor. 
 
 Upload the .env file again and modify the variables 'COURSE' and 'EXTERNAL_PORT' to reflect the name of the course and increment one up from the last course (ie, if the EXTERNAL_PORT for the last created course was '8001', give this one '8002'.)
 

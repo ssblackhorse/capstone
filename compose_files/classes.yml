@@ -17,6 +17,7 @@ services:
       - ACCESS_LOG=-
       - ERROR_LOG=-
       - REVERSE_PROXY=true
+      - APPLICATION_ROOT=/${COURSE}
     volumes:
       - ${COURSEDIR}/${COURSE}/logs:/var/log/CTFd
       - ${COURSEDIR}/${COURSE}/uploads:/var/uploads

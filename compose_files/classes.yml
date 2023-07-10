@@ -6,6 +6,10 @@ services:
     container_name: ${COURSE}
     user: root
     restart: always
+    labels:
+      - homepage.group=Challenges
+      - homepage.name=${COURSE}
+      - homepage.href=https://training.blackhorse.info/${COURSE}
     ports:
       - ${EXTERNAL_PORT}:8000
     environment:
